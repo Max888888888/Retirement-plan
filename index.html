@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>養老服務教戰手冊</title>
+<meta name="theme-color" content="#1E4D3A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="教戰手冊">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root{
+    --pine:#1E4D3A;        /* 主色：松綠，長壽、沉穩 */
+    --pine-deep:#143528;
+    --gold:#B8923A;        /* 點綴：金，只用在星標與少數強調 */
+    --paper:#F4F6F3;       /* 底色：淡灰綠紙 */
+    --white:#FFFFFF;
+    --ink:#22271F;
+    --ink-2:#5C6357;
+    --line:#DCE2DB;
+    --c-course:#1E4D3A;    /* 課程筆記 */
+    --c-field:#8A5A1E;     /* 實戰心得 */
+    --c-rule:#A33A2E;      /* 注意事項 */
+    --c-product:#2E5A8A;   /* 產品與話術 */
+    --serif:"Noto Serif TC","Songti TC","Songti SC","SimSun","Georgia",serif;
+    --sans:"PingFang TC","PingFang SC","Noto Sans TC","Microsoft JhengHei","Helvetica Neue",Arial,sans-serif;
+    --radius:10px;
+    --nav-h:58px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%}
+  button,input,select,textarea{font:inherit;color:inherit}
+  button{cursor:pointer;background:none;border:0;padding:0}
+  a{color:var(--pine)}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+  /* ── 上方列 ── */
+  .topbar{position:sticky;top:0;z-index:20;background:var(--pine);color:#fff;padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .topbar h1{margin:0;font-family:var(--serif);font-weight:600;font-size:19px;letter-spacing:.04em}
+  .topbar h1 small{display:block;font-family:var(--sans);font-weight:400;font-size:11px;opacity:.75;letter-spacing:.02em}
+  .topbar .right{display:flex;align-items:center;gap:8px}
+  .sync-pill{font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.14);white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis}
+  .sync-pill.ok{background:rgba(184,146,58,.35)}
+  .sync-pill.bad{background:rgba(163,58,46,.55)}
+  .iconbtn{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:20px}
+  .iconbtn:hover{background:rgba(255,255,255,.12)}
+
+  /* ── 版面：手機底部分頁 / 桌機左側欄 ── */
+  .shell{display:flex;min-height:calc(100vh - 60px)}
+  .rail{display:none}
+  main{flex:1;max-width:860px;margin:0 auto;padding:18px 16px calc(var(--nav-h) + 90px);width:100%}
+  .tabbar{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--white);border-top:1px solid var(--line);display:flex;height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom)}
+  .tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--ink-2);border-top:2px solid transparent}
+  .tabbar button .ic{font-size:20px;line-height:1}
+  .tabbar button.on{color:var(--pine);border-top-color:var(--pine);font-weight:600}
+  @media (min-width:820px){
+    .tabbar{display:none}
+    .rail{display:flex;flex-direction:column;gap:4px;width:200px;padding:22px 12px;border-right:1px solid var(--line);position:sticky;top:60px;height:calc(100vh - 60px)}
+    .rail button{text-align:left;padding:10px 12px;border-radius:8px;color:var(--ink-2);display:flex;gap:10px;align-items:center}
+    .rail button.on{background:var(--white);color:var(--pine);font-weight:600;box-shadow:inset 3px 0 0 var(--pine)}
+    .rail button:hover{background:rgba(255,255,255,.7)}
+    main{padding:26px 34px 120px}
+  }
+
+  /* ── 通用 ── */
+  h2.sec{font-family:var(--serif);font-weight:600;font-size:22px;margin:6px 0 4px;color:var(--pine-deep)}
+  .lead{color:var(--ink-2);font-size:14px;margin:0 0 16px}
+  .search{display:flex;gap:8px;margin-bottom:14px}
+  .search input{flex:1;padding:11px 14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--white)}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+  .chip{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--white);color:var(--ink-2)}
+  .chip.on{background:var(--pine);border-color:var(--pine);color:#fff}
+  .empty{border:1px dashed var(--line);border-radius:var(--radius);padding:26px 18px;text-align:center;color:var(--ink-2);font-size:14px;background:rgba(255,255,255,.5)}
+  .empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:6px}
+
+  /* 條目：不做卡片堆疊，而是左側一條「書脊」，顏色代表分類 */
+  .list{display:flex;flex-direction:column;gap:2px}
+  .entry{display:grid;grid-template-columns:5px 1fr auto;gap:0 14px;background:var(--white);padding:12px 14px 12px 0;border-radius:6px;text-align:left;width:100%;align-items:start;border-bottom:1px solid var(--paper)}
+  .entry:hover{background:#FBFCFA}
+  .entry .spine{height:100%;min-height:36px;border-radius:0 3px 3px 0}
+  .entry .t{font-weight:600;font-size:15px;line-height:1.45}
+  .entry .m{font-size:12px;color:var(--ink-2);margin-top:2px;display:flex;flex-wrap:wrap;gap:4px 10px}
+  .entry .m .tag{color:var(--pine)}
+  .entry .star{color:var(--gold);font-size:18px;padding-top:2px}
+  .entry .snip{font-size:13px;color:var(--ink-2);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .spine.course{background:var(--c-course)} .spine.field{background:var(--c-field)}
+  .spine.rule{background:var(--c-rule)} .spine.product{background:var(--c-product)}
+
+  /* 首頁 */
+  .quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0 22px}
+  .quick button{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);padding:14px 14px;text-align:left;display:flex;flex-direction:column;gap:2px;border-left-width:5px}
+  .quick button b{font-size:15px}
+  .quick button span{font-size:12px;color:var(--ink-2)}
+  .quick .q-course{border-left-color:var(--c-course)} .quick .q-field{border-left-color:var(--c-field)}
+  .quick .q-rule{border-left-color:var(--c-rule)} .quick .q-product{border-left-color:var(--c-product)}
+  @media (min-width:820px){.quick{grid-template-columns:repeat(4,1fr)}}
+  .hero{background:var(--pine);color:#fff;border-radius:12px;padding:18px 20px;margin-bottom:6px}
+  .hero .k{font-size:12px;opacity:.75}
+  .hero .v{font-family:var(--serif);font-size:19px;line-height:1.5;margin-top:4px}
+  .hero .v.soft{opacity:.85;font-size:15px}
+  .stats{display:flex;gap:16px;font-size:13px;color:var(--ink-2);margin:6px 0 4px;flex-wrap:wrap}
+  .stats b{color:var(--ink)}
+  h3.sub{font-size:14px;color:var(--ink-2);font-weight:600;margin:22px 0 8px}
+
+  /* 新增按鈕 */
+  .fab{position:fixed;right:18px;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px);width:56px;height:56px;border-radius:50%;background:var(--pine);color:#fff;font-size:30px;line-height:1;display:grid;place-items:center;box-shadow:0 6px 18px rgba(20,53,40,.35);z-index:15}
+  @media (min-width:820px){.fab{bottom:28px;right:32px}.toast{bottom:36px}}
+
+  /* 底部面板（表單、詳情、設定） */
+  .veil{position:fixed;inset:0;background:rgba(20,30,24,.45);z-index:30;display:none}
+  .veil.show{display:block}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--white);border-radius:16px 16px 0 0;max-height:92vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .22s ease;padding-bottom:env(safe-area-inset-bottom)}
+  .sheet.show{transform:translateY(0)}
+  @media (min-width:820px){.sheet{left:50%;right:auto;bottom:auto;top:50%;width:640px;max-height:88vh;border-radius:14px;transform:translate(-50%,-46%);opacity:0;pointer-events:none}.sheet.show{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}}
+  .sheet header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+  .sheet header b{font-family:var(--serif);font-size:17px}
+  .sheet .body{overflow:auto;padding:14px 18px 20px}
+  .sheet footer{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+  .btn{padding:10px 16px;border-radius:8px;border:1px solid var(--line);background:var(--white);font-size:14px}
+  .btn.primary{background:var(--pine);border-color:var(--pine);color:#fff;font-weight:600}
+  .btn.danger{color:var(--c-rule);border-color:#E7C9C5}
+  .btn.ghost{border-color:transparent;color:var(--ink-2)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:13px;color:var(--ink-2);margin-bottom:4px}
+  .field label i{font-style:normal;color:var(--c-rule)}
+  .field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#FBFCFA}
+  .field textarea{min-height:76px;resize:vertical}
+  .field textarea.big{min-height:150px}
+  .field .hint{font-size:12px;color:var(--ink-2);margin-top:3px}
+  .typepick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .typepick button{padding:7px 12px;border-radius:999px;border:1px solid var(--line);font-size:13px;background:var(--white)}
+  .typepick button.on{color:#fff;border-color:transparent}
+  .typepick .course.on{background:var(--c-course)} .typepick .field-t.on{background:var(--c-field)}
+  .typepick .rule.on{background:var(--c-rule)} .typepick .product.on{background:var(--c-product)}
+
+  /* 詳情 */
+  .detail .row{margin-bottom:14px}
+  .detail .row .k{font-size:12px;color:var(--ink-2);margin-bottom:2px}
+  .detail .row .v{white-space:pre-wrap;font-size:15px}
+  .detail .head{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;padding-left:12px;border-left:4px solid var(--line)}
+  .detail .head.course{border-color:var(--c-course)} .detail .head.field{border-color:var(--c-field)}
+  .detail .head.rule{border-color:var(--c-rule)} .detail .head.product{border-color:var(--c-product)}
+  .detail .head .tt{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.4}
+  .detail .head .mm{font-size:12px;color:var(--ink-2)}
+
+  /* 設定 */
+  .set-block{border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+  .set-block h4{margin:0 0 6px;font-size:15px}
+  .set-block p{margin:0 0 10px;font-size:13px;color:var(--ink-2)}
+  .set-block .row{display:flex;gap:8px;flex-wrap:wrap}
+  details{font-size:13px;color:var(--ink-2);margin-top:8px}
+  details summary{cursor:pointer;color:var(--pine)}
+  details ol{padding-left:18px;margin:6px 0}
+  .msg{font-size:13px;margin-top:8px;min-height:18px}
+  .msg.ok{color:var(--pine)} .msg.bad{color:var(--c-rule)}
+
+  /* 提示條 */
+  .toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 30px);transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:9px 16px;border-radius:999px;font-size:13px;opacity:0;transition:.2s;z-index:40;pointer-events:none;white-space:nowrap}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>養老服務教戰手冊<small>課程筆記 · 實戰心得 · 注意事項 · 產品與話術</small></h1>
+  <div class="right">
+    <button class="sync-pill" id="syncPill" title="點一下立即同步">未設定同步</button>
+    <button class="iconbtn" id="btnSettings" aria-label="設定">⚙</button>
+  </div>
+</div>
+
+<div class="shell">
+  <nav class="rail" id="rail"></nav>
+  <main id="main"></main>
+</div>
+
+<nav class="tabbar" id="tabbar"></nav>
+<button class="fab" id="fab" aria-label="新增一筆">＋</button>
+
+<div class="veil" id="veil"></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true">
+  <header><b id="sheetTitle">標題</b><button class="btn ghost" id="sheetClose">關閉</button></header>
+  <div class="body" id="sheetBody"></div>
+  <footer id="sheetFoot"></footer>
+</section>
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════ 資料定義 ═══════════════
+const STORE_KEY = 'eldercare_manual_v1';
+const TYPES = {
+  course: { label:'課程筆記', icon:'📚', cls:'course', hint:'上完課馬上寫，三個重點就夠',
+    fields:[
+      {k:'date',label:'日期',type:'date'},
+      {k:'title',label:'課程名稱',type:'text',req:true,ph:'例如：高端養老社區入住流程'},
+      {k:'teacher',label:'講師 / 來源',type:'text',ph:'例如：培訓部 王經理'},
+      {k:'keypoints',label:'三個重點',type:'textarea',ph:'一行一個，只寫最重要的三件事'},
+      {k:'notes',label:'詳細筆記',type:'textarea',big:true},
+      {k:'questions',label:'我的疑問 / 待確認',type:'textarea',ph:'還沒搞懂的，之後問主管'},
+    ]},
+  field: { label:'實戰心得', icon:'🎯', cls:'field', hint:'見完客戶當天寫，記感受也記做法',
+    fields:[
+      {k:'date',label:'日期',type:'date'},
+      {k:'title',label:'情境一句話',type:'text',req:true,ph:'例如：客戶擔心養老社區以後漲價'},
+      {k:'client',label:'客戶概況（匿名）',type:'text',ph:'例如：62歲企業主，兩個孩子在海外'},
+      {k:'what',label:'發生了什麼',type:'textarea'},
+      {k:'did',label:'我怎麼做 / 怎麼說',type:'textarea'},
+      {k:'result',label:'結果',type:'textarea',ph:'客戶反應、有沒有下一步'},
+      {k:'lesson',label:'學到什麼 / 下次怎麼做更好',type:'textarea',big:true},
+    ]},
+  rule: { label:'注意事項', icon:'⚠️', cls:'rule', hint:'一句話規則，越短越好記',
+    fields:[
+      {k:'cat',label:'類別',type:'select',opts:['合規紅線','溝通話術','產品知識','服務流程','客戶心理','其他']},
+      {k:'title',label:'一句話規則',type:'text',req:true,ph:'例如：不對非保證收益做任何承諾'},
+      {k:'why',label:'為什麼 / 背景',type:'textarea'},
+      {k:'source',label:'來源',type:'text',ph:'課程、主管提醒、親身踩雷…'},
+    ]},
+  product: { label:'產品與話術', icon:'💼', cls:'product', hint:'客戶會問的話，和我準備好的回答',
+    fields:[
+      {k:'cat',label:'類別',type:'select',opts:['產品速查','客戶常見問題','異議處理','養老資源']},
+      {k:'title',label:'名稱 / 客戶會問的話',type:'text',req:true,ph:'例如：「現在買年金會不會太早？」'},
+      {k:'core',label:'核心內容 / 我的回應',type:'textarea',big:true},
+      {k:'fit',label:'適合誰 / 什麼時候用',type:'textarea'},
+      {k:'objection',label:'常見異議與回應',type:'textarea'},
+    ]},
+};
+const TYPE_ORDER = ['course','field','rule','product'];
+
+// 範例資料（可在設定裡一鍵刪除）
+const SAMPLES = [
+  {type:'rule', star:true, tags:['範例','合規'], fields:{cat:'合規紅線', title:'分紅、萬能帳戶結算利率屬「非保證」，只能演示，不能承諾', why:'保證部分和非保證部分要分開講清楚。客戶事後拿錄音投訴「你說過保證多少」，責任全在業務員。', source:'入職合規培訓'}},
+  {type:'rule', tags:['範例','流程'], fields:{cat:'服務流程', title:'年長客戶投保，簽單過程要可回溯（雙錄），先確認再開始', why:'避免事後爭議，也是保護自己。', source:'入職合規培訓'}},
+  {type:'rule', tags:['範例','客戶心理'], fields:{cat:'客戶心理', title:'高淨值客戶問「收益多少」時，真正在意的常是「安排」：傳承、隔離、誰來照顧', why:'先把安排講清楚，收益反而變次要。', source:'主管提醒'}},
+  {type:'product', tags:['範例'], fields:{cat:'客戶常見問題', title:'「現在就買養老年金會不會太早？」', core:'把「早」換成「便宜」來談：同樣的養老金，越早開始，每年要放的錢越少，時間在幫客戶工作。', fit:'45～55歲、有穩定現金流、剛開始想養老的客戶', objection:'「我還年輕」→ 認同，再問：「那您希望65歲時，每個月有多少是不用看市場臉色的固定收入？」'}},
+];
+</script>
+<script>
+// ═══════════════ 儲存與狀態 ═══════════════
+let state = load();
+let tab = 'home', query = '', tagFilter = '', catFilter = '';
+let syncTimer = null;
+
+function load(){
+  try{ const s = JSON.parse(localStorage.getItem(STORE_KEY)); if(s && s.entries) return s; }catch(e){}
+  const s = { version:1, entries:[], settings:{ token:'', gistId:'', lastSync:0, samplesAdded:false } };
+  return s;
+}
+function persist(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function today(){ const d=new Date(); return d.toISOString().slice(0,10); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function live(){ return state.entries.filter(e=>!e.deleted); }
+
+if(!state.settings.samplesAdded){
+  const t = Date.now();
+  SAMPLES.forEach((s,i)=> state.entries.push({ id:uid(), type:s.type, star:!!s.star, tags:s.tags||[], fields:s.fields, createdAt:t-i, updatedAt:t-i, deleted:false }));
+  state.settings.samplesAdded = true; persist();
+}
+
+// ═══════════════ 導覽 ═══════════════
+const NAV = [{id:'home',icon:'🏠',label:'首頁'}, ...TYPE_ORDER.map(t=>({id:t,icon:TYPES[t].icon,label:TYPES[t].label}))];
+function renderNav(){
+  const html = NAV.map(n=>`<button class="${tab===n.id?'on':''}" data-tab="${n.id}"><span class="ic">${n.icon}</span><span>${n.label}</span></button>`).join('');
+  document.getElementById('tabbar').innerHTML = html;
+  document.getElementById('rail').innerHTML = html;
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{ tab=b.dataset.tab; query=''; tagFilter=''; catFilter=''; render(); window.scrollTo(0,0); });
+}
+
+// ═══════════════ 畫面 ═══════════════
+function render(){
+  renderNav();
+  const m = document.getElementById('main');
+  m.innerHTML = tab==='home' ? homeView() : listView(tab);
+  bindMain();
+  renderSyncPill();
+}
+
+function entryTitle(e){ return e.fields.title || '（未命名）'; }
+function entrySnippet(e){
+  const f=e.fields; const t=TYPES[e.type];
+  const pick = {course:f.keypoints||f.notes, field:f.lesson||f.what, rule:f.why, product:f.core}[e.type] || '';
+  return pick;
+}
+function entryRow(e){
+  const f=e.fields; const meta=[];
+  if(f.date) meta.push(f.date);
+  if(f.cat) meta.push(f.cat);
+  if(f.teacher) meta.push(f.teacher);
+  if(f.client) meta.push(f.client);
+  (e.tags||[]).forEach(t=>meta.push(`<span class="tag">#${esc(t)}</span>`));
+  const snip = entrySnippet(e);
+  return `<button class="entry" data-open="${e.id}">
+    <span class="spine ${TYPES[e.type].cls}"></span>
+    <span><span class="t">${esc(entryTitle(e))}</span>
+      ${snip?`<span class="snip">${esc(snip)}</span>`:''}
+      <span class="m">${meta.join('')}</span></span>
+    <span class="star">${e.star?'★':''}</span>
+  </button>`;
+}
+function matches(e,q){
+  if(!q) return true;
+  const hay = [entryTitle(e), ...(e.tags||[]), ...Object.values(e.fields)].join('\n').toLowerCase();
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every(w=>hay.includes(w));
+}
+function sortByDate(a,b){ return (b.fields.date||'').localeCompare(a.fields.date||'') || b.updatedAt-a.updatedAt; }
+
+function homeView(){
+  const all = live();
+  const q = query.trim();
+  const starred = all.filter(e=>e.star).sort((a,b)=>b.updatedAt-a.updatedAt);
+  const recent = all.slice().sort((a,b)=>b.updatedAt-a.updatedAt).slice(0,6);
+  const counts = TYPE_ORDER.map(t=>`<span>${TYPES[t].icon} <b>${all.filter(e=>e.type===t).length}</b> ${TYPES[t].label}</span>`).join('');
+  const rule = starred.find(e=>e.type==='rule') || all.filter(e=>e.type==='rule')[0];
+  let html = `<div class="hero"><div class="k">今天記得</div>
+    <div class="v ${rule?'':'soft'}">${rule?esc(entryTitle(rule)):'還沒有注意事項。先寫下一條你最不想犯的錯。'}</div></div>
+    <div class="stats">${counts}</div>
+    <div class="search"><input id="q" placeholder="搜尋全部筆記（可打多個字，用空白隔開）" value="${esc(query)}"></div>`;
+  if(q){
+    const hits = all.filter(e=>matches(e,q)).sort((a,b)=>b.updatedAt-a.updatedAt);
+    html += `<h3 class="sub">搜尋結果 ${hits.length} 筆</h3><div class="list">${hits.map(entryRow).join('') || '<div class="empty">沒有符合的筆記</div>'}</div>`;
+    return html;
+  }
+  html += `<div class="quick">${TYPE_ORDER.map(t=>`<button class="q-${t}" data-new="${t}"><b>${TYPES[t].icon} 寫${TYPES[t].label}</b><span>${TYPES[t].hint}</span></button>`).join('')}</div>`;
+  html += `<h3 class="sub">★ 星標重點</h3><div class="list">${starred.map(entryRow).join('') || '<div class="empty">打開任何一筆，按「星標」，它就會固定在這裡</div>'}</div>`;
+  html += `<h3 class="sub">最近更新</h3><div class="list">${recent.map(entryRow).join('') || `<div class="empty"><b>手冊還是空的</b>從上面四個按鈕，或右下角「＋」開始</div>`}</div>`;
+  return html;
+}
+
+function listView(type){
+  const T = TYPES[type];
+  let items = live().filter(e=>e.type===type);
+  const tags = [...new Set(items.flatMap(e=>e.tags||[]))].sort();
+  const catField = T.fields.find(f=>f.type==='select');
+  let html = `<h2 class="sec">${T.icon} ${T.label}</h2><p class="lead">${T.hint}</p>
+    <div class="search"><input id="q" placeholder="搜尋${T.label}" value="${esc(query)}"></div>`;
+  if(catField){
+    html += `<div class="chips">${catField.opts.map(c=>`<button class="chip ${catFilter===c?'on':''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
+  }
+  if(tags.length) html += `<div class="chips">${tags.map(t=>`<button class="chip ${tagFilter===t?'on':''}" data-tag="${esc(t)}">#${esc(t)}</button>`).join('')}</div>`;
+  items = items.filter(e=>matches(e,query) && (!tagFilter || (e.tags||[]).includes(tagFilter)) && (!catFilter || e.fields.cat===catFilter));
+  if(type==='rule' || type==='product'){
+    // 依類別分組
+    const groups = {};
+    items.sort((a,b)=>(b.star-a.star)||b.updatedAt-a.updatedAt).forEach(e=>{ (groups[e.fields.cat||'其他'] = groups[e.fields.cat||'其他'] || []).push(e); });
+    const order = catField.opts.concat(Object.keys(groups).filter(k=>!catField.opts.includes(k)));
+    html += order.filter(k=>groups[k]).map(k=>`<h3 class="sub">${esc(k)}（${groups[k].length}）</h3><div class="list">${groups[k].map(entryRow).join('')}</div>`).join('');
+    if(!items.length) html += `<div class="empty"><b>這裡還沒有內容</b>按右下角「＋」新增第一筆</div>`;
+  } else {
+    items.sort(sortByDate);
+    html += `<div class="list">${items.map(entryRow).join('') || `<div class="empty"><b>這裡還沒有內容</b>按右下角「＋」新增第一筆</div>`}</div>`;
+  }
+  return html;
+}
+
+function bindMain(){
+  const q = document.getElementById('q');
+  if(q){ q.oninput = ()=>{ query=q.value; const pos=q.selectionStart; render(); const nq=document.getElementById('q'); nq.focus(); nq.setSelectionRange(pos,pos); }; }
+  document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openDetail(b.dataset.open));
+  document.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>openForm(null,b.dataset.new));
+  document.querySelectorAll('[data-tag]').forEach(b=>b.onclick=()=>{ tagFilter = tagFilter===b.dataset.tag?'':b.dataset.tag; render(); });
+  document.querySelectorAll('[data-cat]').forEach(b=>b.onclick=()=>{ catFilter = catFilter===b.dataset.cat?'':b.dataset.cat; render(); });
+}
+
+// ═══════════════ 面板 ═══════════════
+const sheet=document.getElementById('sheet'), veil=document.getElementById('veil');
+function openSheet(title, body, foot){
+  document.getElementById('sheetTitle').textContent=title;
+  document.getElementById('sheetBody').innerHTML=body;
+  document.getElementById('sheetFoot').innerHTML=foot||'';
+  veil.classList.add('show'); sheet.classList.add('show');
+  document.getElementById('sheetBody').scrollTop=0;
+}
+function closeSheet(){ veil.classList.remove('show'); sheet.classList.remove('show'); }
+veil.onclick=closeSheet; document.getElementById('sheetClose').onclick=closeSheet;
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSheet(); });
+
+function openDetail(id){
+  const e = state.entries.find(x=>x.id===id); if(!e) return;
+  const T=TYPES[e.type];
+  const rows = T.fields.filter(f=>f.k!=='title' && e.fields[f.k]).map(f=>`<div class="row"><div class="k">${f.label}</div><div class="v">${esc(e.fields[f.k])}</div></div>`).join('');
+  const body = `<div class="detail">
+    <div class="head ${T.cls}"><div><div class="tt">${e.star?'<span style="color:var(--gold)">★</span> ':''}${esc(entryTitle(e))}</div>
+      <div class="mm">${T.icon} ${T.label}${e.fields.cat?' · '+esc(e.fields.cat):''}${(e.tags||[]).length?' · '+e.tags.map(t=>'#'+esc(t)).join(' '):''}</div></div></div>
+    ${rows || '<div class="row"><div class="v" style="color:var(--ink-2)">只有標題，還沒寫內容</div></div>'}
+  </div>`;
+  const foot = `<button class="btn danger" id="dDel">刪除</button><button class="btn" id="dStar">${e.star?'取消星標':'★ 星標'}</button><button class="btn primary" id="dEdit">編輯</button>`;
+  openSheet(T.label, body, foot);
+  document.getElementById('dEdit').onclick=()=>openForm(id);
+  document.getElementById('dStar').onclick=()=>{ e.star=!e.star; e.updatedAt=Date.now(); save(); openDetail(id); };
+  document.getElementById('dDel').onclick=()=>{ if(confirm('確定刪除這一筆？')){ e.deleted=true; e.updatedAt=Date.now(); save(); closeSheet(); toast('已刪除'); } };
+}
+
+function openForm(id, type){
+  const e = id ? state.entries.find(x=>x.id===id) : null;
+  let curType = e ? e.type : (type || (tab!=='home'?tab:'course'));
+  const draft = e ? JSON.parse(JSON.stringify(e.fields)) : {};
+  function formHtml(){
+    const T=TYPES[curType];
+    const pick = e ? '' : `<div class="typepick">${TYPE_ORDER.map(t=>`<button class="${TYPES[t].cls==='field'?'field-t':TYPES[t].cls} ${t===curType?'on':''}" data-type="${t}">${TYPES[t].icon} ${TYPES[t].label}</button>`).join('')}</div>`;
+    const fs = T.fields.map(f=>{
+      const v = draft[f.k] ?? (f.type==='date' ? today() : (f.type==='select'?f.opts[0]:''));
+      let ctl;
+      if(f.type==='textarea') ctl=`<textarea class="${f.big?'big':''}" data-k="${f.k}" placeholder="${esc(f.ph||'')}">${esc(v)}</textarea>`;
+      else if(f.type==='select') ctl=`<select data-k="${f.k}">${f.opts.map(o=>`<option ${o===v?'selected':''}>${esc(o)}</option>`).join('')}</select>`;
+      else ctl=`<input type="${f.type}" data-k="${f.k}" value="${esc(v)}" placeholder="${esc(f.ph||'')}">`;
+      return `<div class="field"><label>${f.label}${f.req?' <i>*</i>':''}</label>${ctl}</div>`;
+    }).join('');
+    const tags = `<div class="field"><label>標籤</label><input id="fTags" value="${esc((e?e.tags:[]).join(', '))}" placeholder="用逗號隔開，例如：年金, 傳承, 王總"><div class="hint">標籤可以是產品、客戶代號、主題，之後方便一鍵篩選</div></div>`;
+    return pick + fs + tags;
+  }
+  function show(){
+    openSheet(e?'編輯':'新增一筆', formHtml(), `<button class="btn ghost" id="fCancel">取消</button><button class="btn primary" id="fSave">儲存</button>`);
+    document.querySelectorAll('[data-type]').forEach(b=>b.onclick=()=>{ collect(); curType=b.dataset.type; show(); });
+    document.getElementById('fCancel').onclick=closeSheet;
+    document.getElementById('fSave').onclick=()=>{
+      collect();
+      if(!(draft.title||'').trim()){ toast('請先填標題'); return; }
+      const tags = document.getElementById('fTags').value.split(/[,，、]/).map(s=>s.trim()).filter(Boolean);
+      const fields = {}; TYPES[curType].fields.forEach(f=>{ if(draft[f.k]!=null && String(draft[f.k]).trim()!=='') fields[f.k]=String(draft[f.k]).trim(); });
+      if(e){ e.fields=fields; e.tags=tags; e.updatedAt=Date.now(); }
+      else state.entries.push({ id:uid(), type:curType, star:false, tags, fields, createdAt:Date.now(), updatedAt:Date.now(), deleted:false });
+      save(); closeSheet(); toast('已儲存');
+    };
+    setTimeout(()=>{ const first=document.querySelector('#sheetBody [data-k="title"]'); if(first && !e) first.focus(); },50);
+  }
+  function collect(){ document.querySelectorAll('#sheetBody [data-k]').forEach(el=>draft[el.dataset.k]=el.value); }
+  show();
+}
+document.getElementById('fab').onclick=()=>openForm(null);
+
+function save(){ persist(); render(); scheduleSync(); }
+
+let toastT;
+function toast(s){ const t=document.getElementById('toast'); t.textContent=s; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1800); }
+
+// ═══════════════ 雲端同步（GitHub Gist） ═══════════════
+const GH = 'https://api.github.com';
+function ghHeaders(){ return { 'Authorization':'token '+state.settings.token, 'Accept':'application/vnd.github+json', 'Content-Type':'application/json' }; }
+function syncReady(){ return !!state.settings.token; }
+function scheduleSync(){ if(!syncReady()) return; clearTimeout(syncTimer); syncTimer=setTimeout(()=>sync(), 2500); }
+
+function mergeEntries(a,b){
+  const map = new Map();
+  [...a,...b].forEach(e=>{ const cur=map.get(e.id); if(!cur || (e.updatedAt||0)>(cur.updatedAt||0)) map.set(e.id,e); });
+  return [...map.values()];
+}
+
+let syncing=false, syncMsg='';
+async function sync(showToast){
+  if(!syncReady() || syncing) return;
+  syncing=true; syncMsg='同步中…'; renderSyncPill();
+  try{
+    let gistId = state.settings.gistId;
+    let remote = null;
+    if(gistId){
+      const r = await fetch(`${GH}/gists/${gistId}`, {headers:ghHeaders()});
+      if(r.status===404){ gistId=''; }
+      else if(!r.ok) throw new Error('讀取雲端失敗 ('+r.status+')');
+      else {
+        const g = await r.json(); const f = g.files && g.files['manual.json'];
+        if(f){ const txt = f.truncated ? await (await fetch(f.raw_url)).text() : f.content; try{ remote=JSON.parse(txt); }catch(e){ remote=null; } }
+      }
+    }
+    if(remote && remote.entries) state.entries = mergeEntries(state.entries, remote.entries);
+    const payload = JSON.stringify({ version:1, entries:state.entries, savedAt:Date.now() }, null, 0);
+    const body = JSON.stringify({ description:'養老服務教戰手冊 資料（自動同步）', public:false, files:{ 'manual.json':{ content:payload } } });
+    if(gistId){
+      const r = await fetch(`${GH}/gists/${gistId}`, {method:'PATCH',headers:ghHeaders(),body});
+      if(!r.ok) throw new Error('寫入雲端失敗 ('+r.status+')');
+    } else {
+      const r = await fetch(`${GH}/gists`, {method:'POST',headers:ghHeaders(),body});
+      if(!r.ok) throw new Error(r.status===401?'金鑰無效或權限不足':'建立雲端檔案失敗 ('+r.status+')');
+      const g = await r.json(); state.settings.gistId = g.id;
+    }
+    state.settings.lastSync = Date.now(); syncMsg='';
+    persist(); render();
+    if(showToast) toast('已同步');
+  }catch(err){
+    syncMsg = '同步失敗：' + (err.message||'網路問題') + '（資料已存在本機）';
+    if(showToast) toast('同步失敗，資料已存在本機');
+  }
+  syncing=false; renderSyncPill();
+}
+function renderSyncPill(){
+  const p=document.getElementById('syncPill');
+  if(!syncReady()){ p.textContent='未設定同步'; p.className='sync-pill'; return; }
+  if(syncing){ p.textContent='同步中…'; p.className='sync-pill'; return; }
+  if(syncMsg){ p.textContent='同步失敗，點此重試'; p.className='sync-pill bad'; p.title=syncMsg; return; }
+  const t=state.settings.lastSync; p.textContent = t ? '已同步 '+new Date(t).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}) : '尚未同步';
+  p.className='sync-pill ok';
+}
+document.getElementById('syncPill').onclick=()=>{ if(syncReady()) sync(true); else openSettings(); };
+
+// ═══════════════ 備份 / 匯入 / 匯出文字 ═══════════════
+function download(name, text, mime){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:mime||'application/json'})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
+function exportJSON(){ download('教戰手冊備份-'+today()+'.json', JSON.stringify({version:1,entries:state.entries},null,2)); toast('已下載備份'); }
+function importJSON(text){
+  let d; try{ d=JSON.parse(text); }catch(e){ toast('檔案格式不對'); return; }
+  if(!d || !Array.isArray(d.entries)){ toast('檔案裡沒有筆記資料'); return; }
+  const before = live().length; state.entries = mergeEntries(state.entries, d.entries); save();
+  toast(`匯入完成，新增 ${live().length-before} 筆`);
+}
+function exportText(){
+  const lines=['# 養老服務教戰手冊', '匯出日期：'+today(), ''];
+  TYPE_ORDER.forEach(t=>{
+    const items = live().filter(e=>e.type===t).sort(sortByDate); if(!items.length) return;
+    lines.push('## '+TYPES[t].label, '');
+    items.forEach(e=>{
+      lines.push(`### ${e.star?'★ ':''}${entryTitle(e)}`);
+      const meta=[e.fields.date,e.fields.cat,...(e.tags||[]).map(x=>'#'+x)].filter(Boolean).join('  '); if(meta) lines.push(meta);
+      TYPES[t].fields.filter(f=>f.k!=='title'&&f.k!=='date'&&f.k!=='cat'&&e.fields[f.k]).forEach(f=>lines.push(`- **${f.label}**：${e.fields[f.k].replace(/\n/g,'\n  ')}`));
+      lines.push('');
+    });
+  });
+  download('教戰手冊-'+today()+'.md', lines.join('\n'), 'text/markdown'); toast('已下載文字版');
+}
+
+// ═══════════════ 設定 ═══════════════
+function openSettings(){
+  const s=state.settings;
+  const body = `
+  <div class="set-block"><h4>雲端同步（電腦和手機共用同一份資料）</h4>
+    <p>同步用的是 GitHub 提供的免費私人小檔案（Gist）。金鑰只存在你自己的裝置裡。</p>
+    <div class="field"><label>GitHub 金鑰（Personal access token）</label><input id="sTok" type="password" value="${esc(s.token)}" placeholder="ghp_ 開頭的一串字"></div>
+    <div class="field"><label>雲端檔案代號（Gist ID）</label><input id="sGist" value="${esc(s.gistId)}" placeholder="第一台裝置留空，同步後會自動產生；第二台裝置把它貼進來"><div class="hint">${s.gistId?'這台裝置的代號就是上面這串。到另一台裝置的設定裡貼上同一串，兩邊就會共用。':''}</div></div>
+    <div class="row"><button class="btn primary" id="sSave">儲存並立即同步</button><button class="btn" id="sClear">停用同步</button></div>
+    <div class="msg" id="sMsg"></div>
+    <details><summary>怎麼拿到金鑰？（只需要做一次）</summary><ol>
+      <li>到 github.com 註冊或登入。</li>
+      <li>右上角頭像 → Settings → 左邊最下面 Developer settings → Personal access tokens → Tokens (classic) → Generate new token (classic)。</li>
+      <li>Note 隨便填（例如「手冊同步」），Expiration 選 No expiration，勾選 <b>gist</b> 這一項就好。</li>
+      <li>按 Generate token，把 ghp_ 開頭的一串字複製，貼到上面「GitHub 金鑰」，按「儲存並立即同步」。</li>
+      <li>換到第二台裝置：貼同一把金鑰，再把第一台顯示的「雲端檔案代號」貼進來，儲存。完成。</li>
+    </ol></details>
+  </div>
+  <div class="set-block"><h4>備份與匯入</h4>
+    <p>沒有網路或不想用雲端時，可以用檔案手動搬資料。匯入會自動合併，不會覆蓋掉已有的筆記。</p>
+    <div class="row"><button class="btn" id="bExport">下載備份檔（JSON）</button><button class="btn" id="bImport">匯入備份檔</button><button class="btn" id="bText">下載文字版（可貼到筆記軟體）</button></div>
+    <input type="file" id="bFile" accept=".json,application/json" style="display:none">
+  </div>
+  <div class="set-block"><h4>其他</h4>
+    <div class="row"><button class="btn" id="bSamples">刪除所有「範例」筆記</button><button class="btn danger" id="bWipe">清空這台裝置的全部資料</button></div>
+    <p style="margin-top:8px">目前共 ${live().length} 筆筆記${s.lastSync?'，上次同步 '+new Date(s.lastSync).toLocaleString('zh-TW'):''}。</p>
+  </div>`;
+  openSheet('設定', body, '');
+  const msg=document.getElementById('sMsg');
+  document.getElementById('sSave').onclick=async()=>{
+    s.token=document.getElementById('sTok').value.trim(); s.gistId=document.getElementById('sGist').value.trim(); syncMsg='';
+    persist(); if(!s.token){ msg.className='msg bad'; msg.textContent='請先貼上金鑰'; return; }
+    msg.className='msg'; msg.textContent='同步中…'; await sync(false);
+    if(syncMsg){ msg.className='msg bad'; msg.textContent=syncMsg; } else { msg.className='msg ok'; msg.textContent='同步成功。雲端檔案代號：'+s.gistId; document.getElementById('sGist').value=s.gistId; }
+  };
+  document.getElementById('sClear').onclick=()=>{ s.token=''; s.gistId=''; syncMsg=''; persist(); renderSyncPill(); msg.className='msg'; msg.textContent='已停用同步，資料仍保留在本機'; document.getElementById('sTok').value=''; document.getElementById('sGist').value=''; };
+  document.getElementById('bExport').onclick=exportJSON;
+  document.getElementById('bText').onclick=exportText;
+  document.getElementById('bImport').onclick=()=>document.getElementById('bFile').click();
+  document.getElementById('bFile').onchange=ev=>{ const f=ev.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ importJSON(r.result); closeSheet(); }; r.readAsText(f); };
+  document.getElementById('bSamples').onclick=()=>{ let n=0; state.entries.forEach(e=>{ if(!e.deleted&&(e.tags||[]).includes('範例')){ e.deleted=true; e.updatedAt=Date.now(); n++; } }); save(); toast(`已刪除 ${n} 筆範例`); closeSheet(); };
+  document.getElementById('bWipe').onclick=()=>{ if(confirm('清空這台裝置的所有筆記？（雲端和其他裝置不受影響）')){ localStorage.removeItem(STORE_KEY); location.reload(); } };
+}
+document.getElementById('btnSettings').onclick=openSettings;
+
+// ═══════════════ 啟動 ═══════════════
+render();
+if(syncReady()) sync(false);
+window.addEventListener('focus',()=>{ if(syncReady() && Date.now()-state.settings.lastSync>60000) sync(false); });
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+</script>
+</body>
+</html>

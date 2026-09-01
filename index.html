@@ -160,6 +160,18 @@
   .msg{font-size:13px;margin-top:8px;min-height:18px}
   .msg.ok{color:var(--pine)} .msg.bad{color:var(--c-rule)}
 
+  /* 圖片 */
+  .imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:6px}
+  .imgs .im{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:#E8EEF8;border:1px solid var(--line)}
+  .imgs .im img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+  .imgs .im .x{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:14px;display:grid;place-items:center}
+  .imgs .add{aspect-ratio:1;border:1px dashed var(--pine);border-radius:8px;color:var(--pine);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;gap:2px;background:#F8FAFD}
+  .imgs .add span{font-size:22px;line-height:1}
+  .lightbox{position:fixed;inset:0;background:rgba(10,15,30,.92);z-index:50;display:none;align-items:center;justify-content:center;padding:16px}
+  .lightbox.show{display:flex}
+  .lightbox img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
+  .lightbox .lx{position:absolute;top:calc(env(safe-area-inset-top) + 12px);right:16px;color:#fff;font-size:28px;width:44px;height:44px}
+
   /* 提示條 */
   .toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 30px);transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:9px 16px;border-radius:999px;font-size:13px;opacity:0;transition:.2s;z-index:40;pointer-events:none;white-space:nowrap}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -190,6 +202,7 @@
   <footer id="sheetFoot"></footer>
 </section>
 <div class="toast" id="toast"></div>
+<div class="lightbox" id="lightbox"><button class="lx" aria-label="關閉">✕</button><img id="lightboxImg" alt=""></div>
 
 <script>
 // ═══════════════ 資料定義 ═══════════════
@@ -252,6 +265,41 @@ function load(){
   return s;
 }
 function persist(){ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+// 圖片存在瀏覽器的 IndexedDB（比 localStorage 大很多），筆記只記圖片編號
+const IMG = {
+  db:null,
+  open(){ if(this.db) return Promise.resolve(this.db); return new Promise((res,rej)=>{ if(!window.indexedDB) return rej(new Error('no idb')); const r=indexedDB.open('manual_images',1); r.onupgradeneeded=()=>r.result.createObjectStore('img',{keyPath:'id'}); r.onsuccess=()=>{ this.db=r.result; res(this.db); }; r.onerror=()=>rej(r.error); }); },
+  async tx(mode,fn){ const db=await this.open(); return new Promise((res,rej)=>{ const t=db.transaction('img',mode); const st=t.objectStore('img'); const q=fn(st); t.oncomplete=()=>res(q&&q.result); t.onerror=()=>rej(t.error); }); },
+  get(id){ return this.tx('readonly',st=>st.get(id)).then(r=>r?r.data:null).catch(()=>null); },
+  put(id,data){ return this.tx('readwrite',st=>st.put({id,data,updatedAt:Date.now()})).catch(()=>{}); },
+  del(id){ return this.tx('readwrite',st=>st.delete(id)).catch(()=>{}); },
+  keys(){ return this.tx('readonly',st=>st.getAllKeys()).then(k=>k||[]).catch(()=>[]); },
+};
+// 截圖通常很大，先縮到最寬 1280、轉成 JPEG，一張大約 100～250KB
+function compressImage(file){
+  return new Promise((res,rej)=>{
+    const img=new Image(); const url=URL.createObjectURL(file);
+    img.onload=()=>{ const max=1280; let w=img.width,h=img.height; const k=Math.min(1,max/Math.max(w,h)); w=Math.round(w*k); h=Math.round(h*k);
+      const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg',0.82)); };
+    img.onerror=()=>{ URL.revokeObjectURL(url); rej(new Error('bad image')); };
+    img.src=url;
+  });
+}
+async function addImageFiles(files, list, onDone){
+  for(const f of files){ if(!f.type.startsWith('image/')) continue;
+    try{ const data=await compressImage(f); const id='i'+uid(); await IMG.put(id,data); list.push(id); }catch(e){ toast('有一張圖片讀不出來'); } }
+  onDone();
+}
+function imgsHtml(ids, editable){
+  return `<div class="imgs">${ids.map(id=>`<div class="im"><img data-img="${id}" alt="">${editable?`<button class="x" data-rm="${id}" aria-label="移除">✕</button>`:''}</div>`).join('')}${editable?'<button class="add" id="imgAdd"><span>＋</span>加圖片</button>':''}</div>`;
+}
+async function fillImgs(root){
+  for(const el of root.querySelectorAll('img[data-img]')){ const d=await IMG.get(el.dataset.img); if(d){ el.src=d; el.onclick=()=>showLightbox(d); } else el.alt='圖片尚未同步到這台裝置'; }
+}
+function showLightbox(src){ document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('show'); }
+document.getElementById('lightbox').onclick=()=>document.getElementById('lightbox').classList.remove('show');
 function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
 function today(){ const d=new Date(); return d.toISOString().slice(0,10); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -293,6 +341,7 @@ function entryRow(e){
   if(f.cat) meta.push(f.cat);
   if(f.teacher) meta.push(f.teacher);
   if(f.client) meta.push(f.client);
+  if((e.images||[]).length) meta.push('📷 '+e.images.length);
   (e.tags||[]).forEach(t=>meta.push(`<span class="tag">#${esc(t)}</span>`));
   const snip = entrySnippet(e);
   return `<button class="entry" data-open="${e.id}">
@@ -376,7 +425,7 @@ function openSheet(title, body, foot){
   veil.classList.add('show'); sheet.classList.add('show');
   document.getElementById('sheetBody').scrollTop=0;
 }
-function closeSheet(){ veil.classList.remove('show'); sheet.classList.remove('show'); }
+function closeSheet(){ veil.classList.remove('show'); sheet.classList.remove('show'); sheet.onpaste=null; }
 veil.onclick=closeSheet; document.getElementById('sheetClose').onclick=closeSheet;
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeSheet(); });
 
@@ -388,9 +437,11 @@ function openDetail(id){
     <div class="head ${T.cls}"><div><div class="tt">${e.star?'<span style="color:var(--gold)">★</span> ':''}${esc(entryTitle(e))}</div>
       <div class="mm">${T.icon} ${T.label}${e.fields.cat?' · '+esc(e.fields.cat):''}${(e.tags||[]).length?' · '+e.tags.map(t=>'#'+esc(t)).join(' '):''}</div></div></div>
     ${rows || '<div class="row"><div class="v" style="color:var(--ink-2)">只有標題，還沒寫內容</div></div>'}
+    ${(e.images||[]).length?`<div class="row"><div class="k">圖片（點一下放大）</div>${imgsHtml(e.images,false)}</div>`:''}
   </div>`;
   const foot = `<button class="btn danger" id="dDel">刪除</button><button class="btn" id="dStar">${e.star?'取消星標':'★ 星標'}</button><button class="btn primary" id="dEdit">編輯</button>`;
   openSheet(T.label, body, foot);
+  fillImgs(document.getElementById('sheetBody'));
   document.getElementById('dEdit').onclick=()=>openForm(id);
   document.getElementById('dStar').onclick=()=>{ e.star=!e.star; e.updatedAt=Date.now(); save(); openDetail(id); };
   document.getElementById('dDel').onclick=()=>{ if(confirm('確定刪除這一筆？')){ e.deleted=true; e.updatedAt=Date.now(); save(); closeSheet(); toast('已刪除'); } };
@@ -400,6 +451,7 @@ function openForm(id, type){
   const e = id ? state.entries.find(x=>x.id===id) : null;
   let curType = e ? e.type : (type || (tab!=='home'?tab:'course'));
   const draft = e ? JSON.parse(JSON.stringify(e.fields)) : {};
+  const imgs = e ? (e.images||[]).slice() : []; const newImgs = [];
   function formHtml(){
     const T=TYPES[curType];
     const pick = e ? '' : `<div class="typepick">${TYPE_ORDER.map(t=>`<button class="${TYPES[t].cls==='field'?'field-t':TYPES[t].cls} ${t===curType?'on':''}" data-type="${t}">${TYPES[t].icon} ${TYPES[t].label}</button>`).join('')}</div>`;
@@ -412,20 +464,27 @@ function openForm(id, type){
       return `<div class="field"><label>${f.label}${f.req?' <i>*</i>':''}</label>${ctl}</div>`;
     }).join('');
     const tags = `<div class="field"><label>標籤</label><input id="fTags" value="${esc((e?e.tags:[]).join(', '))}" placeholder="用逗號隔開，例如：年金, 傳承, 王總"><div class="hint">標籤可以是產品、客戶代號、主題，之後方便一鍵篩選</div></div>`;
-    return pick + fs + tags;
+    const pics = `<div class="field"><label>圖片 / 截圖</label>${imgsHtml(imgs,true)}<div class="hint">手機可從相簿選截圖；電腦可直接 Ctrl+V 貼上截圖</div><input type="file" id="imgFile" accept="image/*" multiple style="display:none"></div>`;
+    return pick + fs + tags + pics;
   }
   function show(){
     openSheet(e?'編輯':'新增一筆', formHtml(), `<button class="btn ghost" id="fCancel">取消</button><button class="btn primary" id="fSave">儲存</button>`);
     document.querySelectorAll('[data-type]').forEach(b=>b.onclick=()=>{ collect(); curType=b.dataset.type; show(); });
-    document.getElementById('fCancel').onclick=closeSheet;
+    document.getElementById('fCancel').onclick=()=>{ newImgs.forEach(id=>IMG.del(id)); closeSheet(); };
+    fillImgs(document.getElementById('sheetBody'));
+    document.getElementById('imgAdd').onclick=()=>document.getElementById('imgFile').click();
+    document.getElementById('imgFile').onchange=ev=>{ const fs=[...ev.target.files]; collect(); const tv=document.getElementById('fTags').value; addImageFiles(fs, imgs, ()=>{ newImgs.push(...imgs.filter(i=>!(e?e.images||[]:[]).includes(i)&&!newImgs.includes(i))); show(); document.getElementById('fTags').value=tv; }); };
+    document.querySelectorAll('#sheetBody [data-rm]').forEach(b=>b.onclick=()=>{ collect(); const tv=document.getElementById('fTags').value; const i=imgs.indexOf(b.dataset.rm); if(i>-1) imgs.splice(i,1); show(); document.getElementById('fTags').value=tv; });
+    sheet.onpaste=ev=>{ const fs=[...(ev.clipboardData||{}).files||[]].filter(f=>f.type.startsWith('image/')); if(!fs.length) return; ev.preventDefault(); collect(); const tv=document.getElementById('fTags').value; addImageFiles(fs, imgs, ()=>{ newImgs.push(...imgs.filter(i=>!(e?e.images||[]:[]).includes(i)&&!newImgs.includes(i))); show(); document.getElementById('fTags').value=tv; toast('已貼上圖片'); }); };
     document.getElementById('fSave').onclick=()=>{
       collect();
       if(!(draft.title||'').trim()){ toast('請先填標題'); return; }
       const tags = document.getElementById('fTags').value.split(/[,，、]/).map(s=>s.trim()).filter(Boolean);
       const fields = {}; TYPES[curType].fields.forEach(f=>{ if(draft[f.k]!=null && String(draft[f.k]).trim()!=='') fields[f.k]=String(draft[f.k]).trim(); });
-      if(e){ e.fields=fields; e.tags=tags; e.updatedAt=Date.now(); }
-      else state.entries.push({ id:uid(), type:curType, star:false, tags, fields, createdAt:Date.now(), updatedAt:Date.now(), deleted:false });
-      save(); closeSheet(); toast('已儲存');
+      (e?e.images||[]:[]).concat(newImgs).filter(i=>!imgs.includes(i)).forEach(i=>IMG.del(i));
+      if(e){ e.fields=fields; e.tags=tags; e.images=imgs; e.updatedAt=Date.now(); }
+      else state.entries.push({ id:uid(), type:curType, star:false, tags, images:imgs, fields, createdAt:Date.now(), updatedAt:Date.now(), deleted:false });
+      sheet.onpaste=null; save(); closeSheet(); toast('已儲存');
     };
     setTimeout(()=>{ const first=document.querySelector('#sheetBody [data-k="title"]'); if(first && !e) first.focus(); },50);
   }
@@ -457,19 +516,31 @@ async function sync(showToast){
   syncing=true; syncMsg='同步中…'; renderSyncPill();
   try{
     let gistId = state.settings.gistId;
-    let remote = null;
+    let remote = null, remoteFiles = {};
     if(gistId){
       const r = await fetch(`${GH}/gists/${gistId}`, {headers:ghHeaders()});
       if(r.status===404){ gistId=''; }
       else if(!r.ok) throw new Error('讀取雲端失敗 ('+r.status+')');
       else {
-        const g = await r.json(); const f = g.files && g.files['manual.json'];
+        const g = await r.json(); remoteFiles = g.files||{}; const f = remoteFiles['manual.json'];
         if(f){ const txt = f.truncated ? await (await fetch(f.raw_url)).text() : f.content; try{ remote=JSON.parse(txt); }catch(e){ remote=null; } }
       }
     }
     if(remote && remote.entries) state.entries = mergeEntries(state.entries, remote.entries);
+    // 圖片：需要的下載回來、本機有的傳上去、沒人用的從雲端拿掉
+    const needed = new Set(live().flatMap(e=>e.images||[]));
+    const localIds = new Set(await IMG.keys());
+    const files = {};
+    for(const id of needed){
+      const name='img_'+id+'.txt';
+      if(!localIds.has(id) && remoteFiles[name]){ try{ const t=await (await fetch(remoteFiles[name].raw_url)).text(); await IMG.put(id,'data:image/jpeg;base64,'+t.trim()); }catch(e){} }
+      else if(localIds.has(id) && !remoteFiles[name]){ const d=await IMG.get(id); if(d) files[name]={content:d.split(',')[1]}; }
+    }
+    for(const name of Object.keys(remoteFiles)){ if(name.startsWith('img_') && !needed.has(name.slice(4,-4))) files[name]=null; }
+    for(const id of localIds){ if(!needed.has(id)) IMG.del(id); }
     const payload = JSON.stringify({ version:1, entries:state.entries, savedAt:Date.now() }, null, 0);
-    const body = JSON.stringify({ description:'養老服務教戰手冊 資料（自動同步）', public:false, files:{ 'manual.json':{ content:payload } } });
+    files['manual.json']={ content:payload };
+    const body = JSON.stringify({ description:'養老服務教戰手冊 資料（自動同步）', public:false, files });
     if(gistId){
       const r = await fetch(`${GH}/gists/${gistId}`, {method:'PATCH',headers:ghHeaders(),body});
       if(!r.ok) throw new Error('寫入雲端失敗 ('+r.status+')');
@@ -499,10 +570,14 @@ document.getElementById('syncPill').onclick=()=>{ if(syncReady()) sync(true); el
 
 // ═══════════════ 備份 / 匯入 / 匯出文字 ═══════════════
 function download(name, text, mime){ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type:mime||'application/json'})); a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
-function exportJSON(){ download('教戰手冊備份-'+today()+'.json', JSON.stringify({version:1,entries:state.entries},null,2)); toast('已下載備份'); }
-function importJSON(text){
+async function exportJSON(){
+  const images={}; for(const id of new Set(live().flatMap(e=>e.images||[]))){ const d=await IMG.get(id); if(d) images[id]=d; }
+  download('教戰手冊備份-'+today()+'.json', JSON.stringify({version:1,entries:state.entries,images})); toast('已下載備份');
+}
+async function importJSON(text){
   let d; try{ d=JSON.parse(text); }catch(e){ toast('檔案格式不對'); return; }
   if(!d || !Array.isArray(d.entries)){ toast('檔案裡沒有筆記資料'); return; }
+  for(const [id,data] of Object.entries(d.images||{})) await IMG.put(id,data);
   const before = live().length; state.entries = mergeEntries(state.entries, d.entries); save();
   toast(`匯入完成，新增 ${live().length-before} 筆`);
 }
@@ -515,6 +590,7 @@ function exportText(){
       lines.push(`### ${e.star?'★ ':''}${entryTitle(e)}`);
       const meta=[e.fields.date,e.fields.cat,...(e.tags||[]).map(x=>'#'+x)].filter(Boolean).join('  '); if(meta) lines.push(meta);
       TYPES[t].fields.filter(f=>f.k!=='title'&&f.k!=='date'&&f.k!=='cat'&&e.fields[f.k]).forEach(f=>lines.push(`- **${f.label}**：${e.fields[f.k].replace(/\n/g,'\n  ')}`));
+      if((e.images||[]).length) lines.push(`- （附 ${e.images.length} 張圖片，見手冊）`);
       lines.push('');
     });
   });

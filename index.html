@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>養老服務教戰手冊</title>
-<meta name="theme-color" content="#1E4D3A">
+<meta name="theme-color" content="#1F4FA3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,18 +14,18 @@
 <link rel="icon" href="icon-192.png">
 <style>
   :root{
-    --pine:#1E4D3A;        /* 主色：松綠，長壽、沉穩 */
-    --pine-deep:#143528;
+    --pine:#1F4FA3;        /* 主色：太保藍 */
+    --pine-deep:#163C80;
     --gold:#B8923A;        /* 點綴：金，只用在星標與少數強調 */
-    --paper:#F4F6F3;       /* 底色：淡灰綠紙 */
+    --paper:#F3F6FB;       /* 底色：淡藍白 */
     --white:#FFFFFF;
-    --ink:#22271F;
-    --ink-2:#5C6357;
-    --line:#DCE2DB;
-    --c-course:#1E4D3A;    /* 課程筆記 */
-    --c-field:#8A5A1E;     /* 實戰心得 */
-    --c-rule:#A33A2E;      /* 注意事項 */
-    --c-product:#2E5A8A;   /* 產品與話術 */
+    --ink:#1F2733;
+    --ink-2:#5A6578;
+    --line:#D9E1EE;
+    --c-course:#1F4FA3;    /* 課程筆記 */
+    --c-field:#0F7B83;     /* 實戰心得 */
+    --c-rule:#C43C31;      /* 注意事項 */
+    --c-product:#6B4FA0;   /* 產品與話術 */
     --serif:"Noto Serif TC","Songti TC","Songti SC","SimSun","Georgia",serif;
     --sans:"PingFang TC","PingFang SC","Noto Sans TC","Microsoft JhengHei","Helvetica Neue",Arial,sans-serif;
     --radius:10px;
@@ -81,7 +81,7 @@
   /* 條目：不做卡片堆疊，而是左側一條「書脊」，顏色代表分類 */
   .list{display:flex;flex-direction:column;gap:2px}
   .entry{display:grid;grid-template-columns:5px 1fr auto;gap:0 14px;background:var(--white);padding:12px 14px 12px 0;border-radius:6px;text-align:left;width:100%;align-items:start;border-bottom:1px solid var(--paper)}
-  .entry:hover{background:#FBFCFA}
+  .entry:hover{background:#F8FAFD}
   .entry .spine{height:100%;min-height:36px;border-radius:0 3px 3px 0}
   .entry .t{font-weight:600;font-size:15px;line-height:1.45}
   .entry .m{font-size:12px;color:var(--ink-2);margin-top:2px;display:flex;flex-wrap:wrap;gap:4px 10px}
@@ -108,11 +108,11 @@
   h3.sub{font-size:14px;color:var(--ink-2);font-weight:600;margin:22px 0 8px}
 
   /* 新增按鈕 */
-  .fab{position:fixed;right:18px;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px);width:56px;height:56px;border-radius:50%;background:var(--pine);color:#fff;font-size:30px;line-height:1;display:grid;place-items:center;box-shadow:0 6px 18px rgba(20,53,40,.35);z-index:15}
+  .fab{position:fixed;right:18px;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 18px);width:56px;height:56px;border-radius:50%;background:var(--pine);color:#fff;font-size:30px;line-height:1;display:grid;place-items:center;box-shadow:0 6px 18px rgba(22,60,128,.35);z-index:15}
   @media (min-width:820px){.fab{bottom:28px;right:32px}.toast{bottom:36px}}
 
   /* 底部面板（表單、詳情、設定） */
-  .veil{position:fixed;inset:0;background:rgba(20,30,24,.45);z-index:30;display:none}
+  .veil{position:fixed;inset:0;background:rgba(20,30,50,.45);z-index:30;display:none}
   .veil.show{display:block}
   .sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--white);border-radius:16px 16px 0 0;max-height:92vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .22s ease;padding-bottom:env(safe-area-inset-bottom)}
   .sheet.show{transform:translateY(0)}
@@ -123,13 +123,13 @@
   .sheet footer{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
   .btn{padding:10px 16px;border-radius:8px;border:1px solid var(--line);background:var(--white);font-size:14px}
   .btn.primary{background:var(--pine);border-color:var(--pine);color:#fff;font-weight:600}
-  .btn.danger{color:var(--c-rule);border-color:#E7C9C5}
+  .btn.danger{color:var(--c-rule);border-color:#EBCBC8}
   .btn.ghost{border-color:transparent;color:var(--ink-2)}
   .btn:disabled{opacity:.5;cursor:default}
   .field{margin-bottom:14px}
   .field label{display:block;font-size:13px;color:var(--ink-2);margin-bottom:4px}
   .field label i{font-style:normal;color:var(--c-rule)}
-  .field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#FBFCFA}
+  .field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#F8FAFD}
   .field textarea{min-height:76px;resize:vertical}
   .field textarea.big{min-height:150px}
   .field .hint{font-size:12px;color:var(--ink-2);margin-top:3px}

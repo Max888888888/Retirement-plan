@@ -116,10 +116,11 @@
   .veil.show{display:block}
   .sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--white);border-radius:16px 16px 0 0;max-height:92vh;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .22s ease;padding-bottom:env(safe-area-inset-bottom)}
   .sheet.show{transform:translateY(0)}
-  @media (min-width:820px){.sheet{left:50%;right:auto;bottom:auto;top:50%;width:640px;max-height:88vh;border-radius:14px;transform:translate(-50%,-46%);opacity:0;pointer-events:none}.sheet.show{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}}
+  @media (min-width:820px){.sheet{left:50%;right:auto;bottom:auto;top:50%;width:min(1100px,94vw);max-height:92vh;border-radius:14px;transform:translate(-50%,-46%);opacity:0;pointer-events:none}.sheet.show{transform:translate(-50%,-50%);opacity:1;pointer-events:auto}}
   .sheet header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
   .sheet header b{font-family:var(--serif);font-size:17px}
   .sheet .body{overflow:auto;padding:14px 18px 20px}
+  @media (min-width:820px){.sheet .body{padding:20px 32px 28px}.detail .row .v{font-size:16px;line-height:1.75}.sheet header{padding:16px 32px}.sheet footer{padding:14px 32px}}
   .sheet footer{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
   .btn{padding:10px 16px;border-radius:8px;border:1px solid var(--line);background:var(--white);font-size:14px}
   .btn.primary{background:var(--pine);border-color:var(--pine);color:#fff;font-weight:600}
